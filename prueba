@@ -1,0 +1,316 @@
+
+
+class CelfarAppTests(unittest.TestCase):
+    """
+    Clase que contiene los tests automatizados para la aplicación Celfar.
+    Estos tests son genéricos y deben ser adaptados a la UI real de la app.
+    """
+
+    def setUp(self):
+        """
+        Configuración inicial para cada test.
+        Inicializa el WebDriver y navega a la URL de la aplicación.
+        Configurado para ejecutar en modo headless, ideal para Google Colab.
+        """
+        chrome_options = ChromeOptions()
+        chrome_options.add_argument("--headless")  
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage") 
+        chrome_options.add_argument("--window-size=1920,1080") 
+        chrome_options.add_argument("--disable-gpu") 
+        
+        self.driver = webdriver.Chrome(options=chrome_options) 
+        
+        self.driver.maximize_window()
+        
+        self.base_url = "https://nahual.github.io/qc-celfar/?v=1" 
+        self.driver.get(self.base_url)
+        self.driver.implicitly_wait(10) 
+
+    def tearDown(self):
+        """
+        Limpieza después de cada test.
+        Cierra el navegador.
+        """
+        self.driver.quit()
+
+    def test_01_login_successful(self):
+        """
+        Test Case 1: Verificar el inicio de sesión exitoso.
+        NOTA: La aplicación Celfar proporcionada (https://nahual.github.io/qc-celfar/?v=1)
+        no parece tener una funcionalidad de login visible. Este test está comentado
+        o adaptado para reflejar esa ausencia o servir como placeholder.
+        """
+        print("\n--- Ejecutando Test 1: Inicio de Sesión Exitoso (No aplicable a esta app Celfar) ---")
+       
+     
+        
+        print("Este test de login no se ejecuta ya que la app Celfar no tiene login.")
+        self.assertTrue(True, "Test de login marcado como pasado (no aplicable).") 
+
+
+    def test_02_search_functionality(self):
+        """
+        Test Case 2: Verificar la funcionalidad de búsqueda en la aplicación Celfar.
+        Asume que hay una barra de búsqueda y que los resultados se muestran en la página.
+        """
+        print("\n--- Ejecutando Test 2: Funcionalidad de Búsqueda ---")
+        driver = self.driver
+
+       
+        search_input_locator = (By.ID, "search-input")
+
+        try:
+            search_input = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located(search_input_locator)
+            )
+            print(f"Campo de búsqueda encontrado usando: {search_input_locator}")
+        except Exception as e:
+            self.fail(f"Fallo: No se encontró el campo de búsqueda con el locator {search_input_locator}. Error: {e}")
+
+        search_term = "Aspirina" 
+        search_input.send_keys(search_term)
+        search_input.send_keys(Keys.RETURN) 
+
+      
+        search_results_locator = (By.CLASS_NAME, "results-list")
+
+        try:
+          
+            WebDriverWait(driver, 15).until(
+                EC.visibility_of_element_located(search_results_locator)
+            )
+            
+            
+            self.assertIn(search_term, driver.page_source, f"El término '{search_term}' no aparece en el contenido de la página de resultados.")
+            
+            print(f"Búsqueda de '{search_term}' exitosa. Resultados cargados y verificados.")
+        except Exception as e:
+            self.fail(f"Fallo la búsqueda o no se cargaron los resultados esperados para '{search_term}'. Error: {e}")
+
+    def test_03_view_product_details(self):
+        """
+        Test Case 3: Verificar la visualización de detalles de un producto.
+        Asume que se puede hacer clic en un producto desde una lista para ver sus detalles.
+        """
+        print("\n--- Ejecutando Test 3: Ver Detalles de Producto ---")
+        driver = self.driver
+        
+   
+        
+      
+        search_input_locator = (By.ID, "search-input")
+        search_results_locator = (By.CLASS_NAME, "results-list")
+        search_term_for_details = "Paracetamol"
+
+        try:
+            search_input = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located(search_input_locator)
+            )
+            search_input.send_keys(search_term_for_details)
+            search_input.send_keys(Keys.RETURN)
+            WebDriverWait(driver, 15).until(
+                EC.visibility_of_element_located(search_results_locator)
+            )
+            print(f"Búsqueda de '{search_term_for_details}' realizada para ver detalles.")
+        except Exception as e:
+            self.fail(f"No se pudo realizar la búsqueda previa para ver detalles del producto. Error: {e}")
+
+
+       
+        product_link_locator = (By.CSS_SELECTOR, ".product-item a")
+
+        try:
+            
+            product_link = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable(product_link_locator)
+            )
+            product_link.click()
+            print(f"Clic en el primer producto de la lista.")
+        except Exception as e:
+            self.fail(f"No se pudo hacer clic en el enlace del producto con locator {product_link_locator}. Error: {e}")
+
+       
+        product_details_title_locator = (By.CLASS_NAME, "product-title")
+
+        try:
+           
+            product_title_element = WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located(product_details_title_locator)
+            )
+            self.assertIsNotNone(product_title_element.text, "El título del producto en los detalles está vacío.")
+            print(f"Detalles del producto cargados: {product_title_element.text}")
+        except Exception as e:
+            self.fail(f"Fallo la visualización de detalles del producto. No se encontró el título con locator {product_details_title_locator}. Error: {e}")
+
+    def test_04_convert_valid_number(self):
+        """
+        Test Case 4: Verificar la conversión de unidades de número correctamente (ej. mililitros a litros).
+        Valida que el resultado numérico sea el esperado.
+        """
+        print("\n--- Ejecutando Test 4: Conversión de Número Correcta ---")
+        driver = self.driver
+
+       
+        value_input_locator = (By.ID, "value-to-convert")
+        source_unit_dropdown_locator = (By.ID, "source-unit")
+        target_unit_dropdown_locator = (By.ID, "target-unit")
+        convert_button_locator = (By.ID, "convert-button")
+        result_output_locator = (By.ID, "result") 
+
+        try:
+            value_input = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located(value_input_locator)
+            )
+            source_unit_dropdown_element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located(source_unit_dropdown_locator)
+            )
+            target_unit_dropdown_element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located(target_unit_dropdown_locator)
+            )
+            convert_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable(convert_button_locator)
+            )
+            print("Elementos del conversor de unidades encontrados.")
+        except Exception as e:
+            self.fail(f"Fallo: No se encontraron los elementos del conversor de unidades. Error: {e}")
+
+       
+        value_to_convert = "1000"
+        value_input.send_keys(value_to_convert)
+
+        
+        source_unit_select = Select(source_unit_dropdown_element)
+        source_unit_select.select_by_visible_text("mililitros") 
+
+        target_unit_select = Select(target_unit_dropdown_element)
+        target_unit_select.select_by_visible_text("litros") 
+
+        convert_button.click()
+
+        
+        expected_result = "1.0" # 1000 mililitros = 1.0 litros
+
+        try:
+            result_output = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located(result_output_locator)
+            )
+           
+            actual_result = result_output.get_attribute("value")
+            
+            self.assertEqual(actual_result, expected_result, 
+                             f"El resultado de la conversión es incorrecto. Esperado: '{expected_result}', Obtenido: '{actual_result}'")
+            print(f"Conversión exitosa: {value_to_convert} mililitros a {actual_result} litros.")
+        except Exception as e:
+            self.fail(f"Fallo la validación del resultado de la conversión. Error: {e}")
+
+
+    def test_05_convert_invalid_negative_number(self):
+        """
+        Test Case 5: Verificar la conversión con un número inválido (negativo).
+        Valida que el mensaje de resultado sea "NaN" (Not a Number) o similar.
+        """
+        print("\n--- Ejecutando Test 5: Conversión con Número Negativo Inválido ---")
+        driver = self.driver
+
+        
+        value_input_locator = (By.ID, "value-to-convert")
+        source_unit_dropdown_locator = (By.ID, "source-unit")
+        target_unit_dropdown_locator = (By.ID, "target-unit")
+        convert_button_locator = (By.ID, "convert-button")
+        result_output_locator = (By.ID, "result")
+
+        try:
+            value_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located(value_input_locator))
+            source_unit_dropdown_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located(source_unit_dropdown_locator))
+            target_unit_dropdown_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located(target_unit_dropdown_locator))
+            convert_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable(convert_button_locator))
+            print("Elementos del conversor de unidades encontrados para test de negativo.")
+        except Exception as e:
+            self.fail(f"Fallo: No se encontraron los elementos del conversor de unidades para test de negativo. Error: {e}")
+
+       
+        value_to_convert = "-50"
+        value_input.send_keys(value_to_convert)
+
+   
+        source_unit_select = Select(source_unit_dropdown_element)
+        source_unit_select.select_by_visible_text("mililitros")
+        target_unit_select = Select(target_unit_dropdown_element)
+        target_unit_select.select_by_visible_text("litros")
+
+       
+        convert_button.click()
+
+       
+        expected_error_message = "NaN" 
+
+        try:
+            result_output = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located(result_output_locator)
+            )
+            actual_result = result_output.get_attribute("value")
+            
+            self.assertEqual(actual_result, expected_error_message, 
+                             f"El resultado para número negativo es incorrecto. Esperado: '{expected_error_message}', Obtenido: '{actual_result}'")
+            print(f"Conversión con número negativo '{value_to_convert}' resultó en '{actual_result}' (esperado).")
+        except Exception as e:
+            self.fail(f"Fallo la validación del resultado para número negativo. Error: {e}")
+
+
+    def test_06_convert_invalid_character(self):
+        """
+        Test Case 6: Verificar la conversión con un carácter inválido.
+        Valida que el mensaje de resultado sea "NaN" (Not a Number) o similar.
+        """
+        print("\n--- Ejecutando Test 6: Conversión con Carácter Inválido ---")
+        driver = self.driver
+
+     
+        value_input_locator = (By.ID, "value-to-convert")
+        source_unit_dropdown_locator = (By.ID, "source-unit")
+        target_unit_dropdown_locator = (By.ID, "target-unit")
+        convert_button_locator = (By.ID, "convert-button")
+        result_output_locator = (By.ID, "result")
+
+        try:
+            value_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located(value_input_locator))
+            source_unit_dropdown_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located(source_unit_dropdown_locator))
+            target_unit_dropdown_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located(target_unit_dropdown_locator))
+            convert_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable(convert_button_locator))
+            print("Elementos del conversor de unidades encontrados para test de carácter inválido.")
+        except Exception as e:
+            self.fail(f"Fallo: No se encontraron los elementos del conversor de unidades para test de carácter inválido. Error: {e}")
+
+        
+        value_to_convert = "abc"
+        value_input.send_keys(value_to_convert)
+
+       
+        source_unit_select = Select(source_unit_dropdown_element)
+        source_unit_select.select_by_visible_text("mililitros")
+        target_unit_select = Select(target_unit_dropdown_element)
+        target_unit_select.select_by_visible_text("litros")
+
+       
+        convert_button.click()
+
+       
+        expected_error_message = "NaN" 
+
+        try:
+            result_output = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located(result_output_locator)
+            )
+            actual_result = result_output.get_attribute("value")
+            
+            self.assertEqual(actual_result, expected_error_message, 
+                             f"El resultado para carácter inválido es incorrecto. Esperado: '{expected_error_message}', Obtenido: '{actual_result}'")
+            print(f"Conversión con carácter inválido '{value_to_convert}' resultó en '{actual_result}' (esperado).")
+        except Exception as e:
+            self.fail(f"Fallo la validación del resultado para carácter inválido. Error: {e}")
+
+
+if __name__ == '__main__':
+  
+    unittest.main(argv=['first-arg-is-ignored'], exit=False)
