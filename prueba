@@ -1,17 +1,10 @@
 
 
 class CelfarAppTests(unittest.TestCase):
-    """
-    Clase que contiene los tests automatizados para la aplicación Celfar.
-    Estos tests son genéricos y deben ser adaptados a la UI real de la app.
-    """
+    
 
     def setUp(self):
-        """
-        Configuración inicial para cada test.
-        Inicializa el WebDriver y navega a la URL de la aplicación.
-        Configurado para ejecutar en modo headless, ideal para Google Colab.
-        """
+     
         chrome_options = ChromeOptions()
         chrome_options.add_argument("--headless")  
         chrome_options.add_argument("--no-sandbox")
@@ -28,19 +21,10 @@ class CelfarAppTests(unittest.TestCase):
         self.driver.implicitly_wait(10) 
 
     def tearDown(self):
-        """
-        Limpieza después de cada test.
-        Cierra el navegador.
-        """
         self.driver.quit()
 
     def test_01_login_successful(self):
-        """
-        Test Case 1: Verificar el inicio de sesión exitoso.
-        NOTA: La aplicación Celfar proporcionada (https://nahual.github.io/qc-celfar/?v=1)
-        no parece tener una funcionalidad de login visible. Este test está comentado
-        o adaptado para reflejar esa ausencia o servir como placeholder.
-        """
+      
         print("\n--- Ejecutando Test 1: Inicio de Sesión Exitoso (No aplicable a esta app Celfar) ---")
        
      
@@ -50,10 +34,7 @@ class CelfarAppTests(unittest.TestCase):
 
 
     def test_02_search_functionality(self):
-        """
-        Test Case 2: Verificar la funcionalidad de búsqueda en la aplicación Celfar.
-        Asume que hay una barra de búsqueda y que los resultados se muestran en la página.
-        """
+       
         print("\n--- Ejecutando Test 2: Funcionalidad de Búsqueda ---")
         driver = self.driver
 
@@ -89,10 +70,7 @@ class CelfarAppTests(unittest.TestCase):
             self.fail(f"Fallo la búsqueda o no se cargaron los resultados esperados para '{search_term}'. Error: {e}")
 
     def test_03_view_product_details(self):
-        """
-        Test Case 3: Verificar la visualización de detalles de un producto.
-        Asume que se puede hacer clic en un producto desde una lista para ver sus detalles.
-        """
+        
         print("\n--- Ejecutando Test 3: Ver Detalles de Producto ---")
         driver = self.driver
         
@@ -144,10 +122,7 @@ class CelfarAppTests(unittest.TestCase):
             self.fail(f"Fallo la visualización de detalles del producto. No se encontró el título con locator {product_details_title_locator}. Error: {e}")
 
     def test_04_convert_valid_number(self):
-        """
-        Test Case 4: Verificar la conversión de unidades de número correctamente (ej. mililitros a litros).
-        Valida que el resultado numérico sea el esperado.
-        """
+       
         print("\n--- Ejecutando Test 4: Conversión de Número Correcta ---")
         driver = self.driver
 
@@ -206,10 +181,7 @@ class CelfarAppTests(unittest.TestCase):
 
 
     def test_05_convert_invalid_negative_number(self):
-        """
-        Test Case 5: Verificar la conversión con un número inválido (negativo).
-        Valida que el mensaje de resultado sea "NaN" (Not a Number) o similar.
-        """
+       
         print("\n--- Ejecutando Test 5: Conversión con Número Negativo Inválido ---")
         driver = self.driver
 
